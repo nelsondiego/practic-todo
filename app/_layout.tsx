@@ -1,58 +1,59 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { Slot } from "expo-router";
+import { useEffect, useState } from "react";
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { Pressable, SafeAreaView, Text, View } from "react-native";
+import { styles } from "@/styles/global";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { StatusBar } from "expo-status-bar";
 
-import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
+GoogleSignin.configure({
+  webClientId: '114635320668-q929qmtv3id6kih119essh44ecfbc2a3.apps.googleusercontent.com',
+});
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  const [initializing, setInitializing] = useState<boolean>(true);
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>();
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
+  const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
+    setUser(user);
+    if (initializing) setInitializing(false);
   }
 
-  return <RootLayoutNav />;
-}
+  const doLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const { idToken } = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(googleCredential);
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) return null;
+
+  if (!user) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <StatusBar style="dark" />
+        <SafeAreaView />
+        <Text style={styles.title}>Practic Todo</Text>
+        <Pressable onPress={doLogin} style={styles.btn}>
+          <Text style={styles.btnText}>Ingresar con Google</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <View style={styles.container}>
+      <StatusBar style="dark" />
+      <Slot/>
+    </View>
   );
 }

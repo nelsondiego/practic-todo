@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "114635320668",
+    "project_id": "practictodo",
+    "storage_bucket": "practictodo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114635320668:android:5727d4c0e1cee959532599",
+        "android_client_info": {
+          "package_name": "com.treslineas.practictodo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114635320668-q929qmtv3id6kih119essh44ecfbc2a3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPh-6FT9m86qko-7kdaydG93oHtUty-zQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114635320668-q929qmtv3id6kih119essh44ecfbc2a3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "114635320668-e7p2f3ms57hg31eouqdt9ppbv2p9ksof.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "practictodo.3lineas.com"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
